@@ -36,7 +36,6 @@ public class LoginPage {
     @Step("get login page title")
     public String getLoginPageTitle() {
     	LOGGER.info("getting page title...");
-    	//return elemUtil.waitForPageTitle(getLoginPageTitle(), 5);
     	return elemUtil.waitForPageTitleToBePresent(Constants.LOGIN_PAGE_TITLE, 5);
     }
     

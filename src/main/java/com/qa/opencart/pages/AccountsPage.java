@@ -53,7 +53,6 @@ public class AccountsPage {
 	public List<String> getAccountSectionsList() {
 		List<String> accountSection=new ArrayList<>();
 		List<WebElement> accountSectionList=elemUtil.getElements(accountSectionsHeaders);
-		int totalCount=accountSectionList.size();
 		for(WebElement e:accountSectionList) {
 			String totalValue=e.getText();
 			accountSection.add(totalValue);
@@ -64,7 +63,7 @@ public class AccountsPage {
 	}
 
 
-	//Search feautures Page Actions
+	//Search features Page Actions......
 	public boolean doSearch(String productName) {
 
 		elemUtil.doSendKeys(searchTextField,productName);
@@ -82,7 +81,7 @@ public class AccountsPage {
 
 		for(WebElement e:resultItemList) {
 			String text=e.getText();
-			System.out.println("Item is::"+text);
+			//System.out.println("Item is::"+text);
 			if(text.equals(productName)) {
 				e.click();
 				break;
