@@ -1,0 +1,8 @@
+
+public Class UserProfilePage{
+
+    public void userProfileDetails{
+      System.out.println("This is user profile page");
+    }
+
+}
