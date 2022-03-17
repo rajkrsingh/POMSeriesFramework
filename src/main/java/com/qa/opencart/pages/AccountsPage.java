@@ -63,7 +63,7 @@ public class AccountsPage {
 	}
 
 
-	//Search features Page Actions......
+	//Search features Page Actions.........
 	public boolean doSearch(String productName) {
 
 		elemUtil.doSendKeys(searchTextField,productName);
@@ -81,7 +81,7 @@ public class AccountsPage {
 
 		for(WebElement e:resultItemList) {
 			String text=e.getText();
-			//System.out.println("Item is::"+text);
+			System.out.println("Item is::"+text);
 			if(text.equals(productName)) {
 				e.click();
 				break;
