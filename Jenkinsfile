@@ -1,54 +1,52 @@
-pipeline{
-agent any
-  stages{
-       stage('Build'){
-           steps{
-              echo "Building"
-           }
-           
-       } 
-       stage('Dev Deploy'){
-           steps{
-              echo "deploy on dev"
-           }
-           
-       }   
-       stage('QA Deploy'){
-           steps{
-              echo "deploy on QA"
-           }
-           
-       }   
-      stage('Sanity Test'){
-           steps{
-              echo "Sanity test execution"
-           }
-      }   
-      stage('Regression Test'){
-           steps{
-              echo "Regression test execution"
-           }      
-       }   
-      stage('Stage deployment'){
-           steps{
-              echo "Stage deployment"
-           }
-      }   
-      stage('Stage sanity test'){
+pipeline { 
+agent any 
+    stages { 
+        
+        stage ('Build') { 
             steps{
-              echo "Sanity test on stage"
-           }
-      }   
-      stage('Stage UAT test'){
-            steps{
-              echo "UAT test on stage"
-           }
-      }   
-        stage('Prod Deployment'){
-           steps{
-              echo "Deployment on prod"
-           }
+                echo "Building the test automation for demo cart app"
+
+            }
         }
-      
-  }
-}
+        
+        stage('Test') {
+            steps {
+                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh "mvn clean install"
+                }
+            }
+        }
+                
+     
+        stage('Publish Allure Reports') {
+           steps {
+                script {
+                    allure([
+                        includeProperties: false,
+                        jdk: '',
+                        properties: [],
+                        reportBuildPolicy: 'ALWAYS',
+                        results: [[path: '/allure-results']]
+                    ])
+                }
+            }
+        }
+        
+        
+        stage('Publish Extent Report'){
+            steps{
+                     publishHTML([allowMissing: false,
+                                  alwaysLinkToLastBuild: false, 
+                                  keepAll: false, 
+                                  reportDir: 'build', 
+                                  reportFiles: 'TestExecutionReport.html', 
+                                  reportName: 'HTML Extent Report', 
+                                  reportTitles: ''])
+            }
+        }
+        
+        
+        
+    }
+
+ }
