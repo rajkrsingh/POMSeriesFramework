@@ -81,10 +81,38 @@ public class DriverFactory {
 	 */
 	
 	public Properties init_prop() {
-		
+		FileInputStream ip=null;
+		String env=System.getProperty("env");
+		LOGGER.info("Running of environment:"+env);
 		prop=new Properties();
+		
 		try {
-			FileInputStream ip= new FileInputStream("./src/test/resources/config/config.properties"); //make the connection between config.properties and java
+		switch(env) {
+		case "dev":
+			ip= new FileInputStream("./src/test/resources/config/dev.config.properties"); //make the connection between config.properties and java
+			 break;
+		case "qa":
+			ip= new FileInputStream("./src/test/resources/config/qa.config.properties"); //make the connection between config.properties and java
+			 break;
+		case "stage":
+			 ip= new FileInputStream("./src/test/resources/config/stage.config.properties"); //make the connection between config.properties and java
+			 break;
+		case "prod":
+			ip= new FileInputStream("./src/test/resources/config/config.properties"); //make the connection between config.properties and java
+			 break;
+		default:
+			break;
+		}
+		}
+		catch(FileNotFoundException e) {
+			e.printStackTrace();
+			LOGGER.error("file not found at the given location....");
+			
+		}
+		
+		
+		try {
+			//FileInputStream ip= new FileInputStream("./src/test/resources/config/config.properties"); //make the connection between config.properties and java
 			prop.load(ip); //load the properties one by one
 		} catch (FileNotFoundException e) {
 			LOGGER.error("file not found at the given location....");
