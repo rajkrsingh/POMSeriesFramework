@@ -4,16 +4,27 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
-import org.apache.log4j.Logger;
+
 import org.apache.commons.io.FileUtils;
+import org.apache.log4j.Logger;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.remote.CapabilityType;
+import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.remote.RemoteWebDriver;
 import org.openqa.selenium.safari.SafariDriver;
+
 import io.github.bonigarcia.wdm.WebDriverManager;
+
+
 
 /**
  * 
@@ -36,23 +47,39 @@ public class DriverFactory {
 	 * @return
 	 */
 	
-	public WebDriver init_Driver(Properties prop) {
-		String browserName=prop.getProperty("browser");
+	public WebDriver init_Driver(String browserName,String browserVersion) {
+		//String browserName=prop.getProperty("browser");
 		LOGGER.info("Browser name is:"+browserName);
+		highlight=prop.getProperty("highlight").trim();
 		optionsManager=new OptionsManager(prop);
-		highlight=prop.getProperty("highlight");
-		
+			
 		if(browserName.equals("chrome")) {
-			LOGGER.info("setup chrome browser...");
+		    LOGGER.info("setup chrome browser...");
 			WebDriverManager.chromedriver().setup();
-			//driver=new ChromeDriver(optionsManager.getChromeOptions());
-			tlDriver.set(new ChromeDriver(optionsManager.getChromeOptions()));
+			
+			  if(Boolean.parseBoolean(prop.getProperty("remote"))) {
+				init_remoteDriver("chrome",browserVersion);
+				
+			}
+			  else {
+			         tlDriver.set(new ChromeDriver(optionsManager.getChromeOptions()));
+			         //tlDriver.set(new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"),cap));
+			  }
 		}
 		else if(browserName.equals("firefox")) {
 			LOGGER.info("setup firefox browser...");
 			WebDriverManager.firefoxdriver().setup();
 			//driver=new FirefoxDriver(optionsManager.getFirefoxOptions());
-			tlDriver.set(new FirefoxDriver(optionsManager.getFirefoxOptions()));
+			//tlDriver.set(new FirefoxDriver(optionsManager.getFirefoxOptions()));
+			
+			if(Boolean.parseBoolean(prop.getProperty("remote"))) {
+				init_remoteDriver("firefox",browserVersion);
+				
+			}
+			  else {
+			         tlDriver.set(new FirefoxDriver(optionsManager.getFirefoxOptions()));
+			         //tlDriver.set(new RemoteWebDriver(new URL("http://localhost:4444/wd/hub"),cap));
+			  }
 		}
 		
 		else if(browserName.equals("safari")) {
@@ -62,6 +89,7 @@ public class DriverFactory {
 		else
 		{
 			System.out.println("Please pass the correct browser"+browserName);
+			LOGGER.info("Please pass the correct browser name : \" + browserName");
 			
 		}
 		
@@ -69,6 +97,53 @@ public class DriverFactory {
 		getDriver().manage().deleteAllCookies();
 		
 		return getDriver();
+		
+	}
+	
+	private void init_remoteDriver(String browser,String browserVersion) {
+		System.out.println("Running test on remote grid server:" +browser);
+		
+		if(browser.equals("chrome")) {
+		   //DesiredCapabilities cap = DesiredCapabilities.chrome();
+		   //cap.setCapability("browserName","chrome");
+		   //cap.setCapability("browserVersion",browserVersion);
+		   //cap.setCapability("enableVNC",true);
+		   //cap.setCapability(ChromeOptions.CAPABILITY,optionsManager.getChromeOptions());
+			ChromeOptions options = new ChromeOptions();
+			options.setCapability("browserName","chrome");
+			options.setCapability("enableVNC",true);
+			options.setCapability(ChromeOptions.CAPABILITY,optionsManager.getChromeOptions());
+			options.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+		   
+		   try {
+		   tlDriver.set(new RemoteWebDriver(new URL(prop.getProperty("huburl")),options));
+		   }catch(MalformedURLException e) {
+			   e.printStackTrace();
+		   }
+		}
+		
+		else if(browser.equals("firefox")) {
+			   /*
+			    DesiredCapabilities cap= DesiredCapabilities.firefox();
+			   cap.setCapability("browserName","firefox");
+			   cap.setCapability("browserVersion",browserVersion);
+			   cap.setCapability("enableVNC",true);
+			   cap.setCapability(ChromeOptions.CAPABILITY,optionsManager.getFirefoxOptions());
+			   
+			   */
+			
+			FirefoxOptions options = new FirefoxOptions();
+			options.setCapability("browserName","firefox");
+			options.setCapability("enableVNC",true);
+			options.setCapability(ChromeOptions.CAPABILITY,optionsManager.getFirefoxOptions());
+			options.setCapability(CapabilityType.ACCEPT_SSL_CERTS, true);
+			
+			   try {
+			   tlDriver.set(new RemoteWebDriver(new URL(prop.getProperty("huburl")),options));
+			   }catch(MalformedURLException e) {
+				   e.printStackTrace();
+			   }
+			}
 		
 	}
 	

@@ -23,12 +23,12 @@ public class BaseTest {
 	
 	
 	@BeforeTest
-	public void setUp() {
+	public void setUp(String browserName, String browserVersion) {
 	df=new DriverFactory();	
 	prop=df.init_prop();
-	//String browserName=prop.getProperty("browser");
+	String browser=prop.getProperty("browser");
 	
-	driver=df.init_Driver(prop);
+	driver=df.init_Driver(browser, browserVersion);
 	driver.get(prop.getProperty("url"));
 	
 	loginPage=new LoginPage(driver);
